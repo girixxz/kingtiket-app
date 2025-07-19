@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin - KingTiket.Pro{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        'primary-dark': '#2563eb'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="bg-white w-64 shadow-lg">
+            <div class="p-6 border-b">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-primary text-white rounded-lg px-2 py-1 font-bold text-sm">KT</div>
+                    <span class="font-bold text-xl text-gray-900">Admin Panel</span>
+                </div>
+            </div>
+            
+            <nav class="mt-6">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors {% if request.endpoint == 'admin_dashboard' %}bg-primary text-white{% endif %}">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="{{ url_for('admin_kategori') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors {% if request.endpoint == 'admin_kategori' %}bg-primary text-white{% endif %}">
+                    <i class="fas fa-tags mr-3"></i>
+                    Kategori Tiket
+                </a>
+                <a href="{{ url_for('admin_tiket') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors {% if request.endpoint == 'admin_tiket' %}bg-primary text-white{% endif %}">
+                    <i class="fas fa-ticket-alt mr-3"></i>
+                    Tiket
+                </a>
+                <a href="{{ url_for('admin_pemesanan') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors {% if request.endpoint == 'admin_pemesanan' %}bg-primary text-white{% endif %}">
+                    <i class="fas fa-shopping-cart mr-3"></i>
+                    Pemesanan
+                </a>
+            </nav>
+            
+            <div class="absolute bottom-0 w-64 p-6 border-t">
+                <a href="{{ url_for('home') }}" class="flex items-center text-gray-700 hover:text-primary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Kembali ke Website
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <div class="bg-white shadow-sm border-b px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">{% block page_title %}Dashboard{% endblock %}</h1>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Hi, {{ session.username }}</span>
+                        <a href="{{ url_for('logout') }}" class="text-gray-600 hover:text-primary">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="p-6">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} bg-{% if category == 'error' %}red{% else %}green{% endif %}-100 border border-{% if category == 'error' %}red{% else %}green{% endif %}-400 text-{% if category == 'error' %}red{% else %}green{% endif %}-700 px-4 py-3 rounded mb-4">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Page Content -->
+            <div class="p-6">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

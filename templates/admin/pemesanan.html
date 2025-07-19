@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Kelola Pemesanan{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-bold">Kelola Pemesanan</h2>
+    <div class="flex space-x-4">
+        <select onchange="filterByStatus(this.value)" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+            <option value="">Semua Status</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="lunas" {% if status_filter == 'lunas' %}selected{% endif %}>Lunas</option>
+        </select>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiket</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for order in orders %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div>
+                        <div class="font-medium text-gray-900">{{ order.user.username }}</div>
+                        <div class="text-sm text-gray-500">{{ order.user.email }}</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div>
+                        <div class="font-medium text-gray-900">{{ order.ticket.title }}</div>
+                        <div class="text-sm text-gray-500">{{ order.ticket.category }}</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                    {{ order.quantity }}x
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                    Rp {{ "{:,}".format(order.total_amount) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    {% if order.status == 'lunas' %}
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Lunas</span>
+                    {% else %}
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Pending</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-500">
+                    {{ order.created_at.strftime('%d %B %Y') }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterByStatus(status) {
+    const url = new URL(window.location);
+    if (status) {
+        url.searchParams.set('status', status);
+    } else {
+        url.searchParams.delete('status');
+    }
+    window.location = url;
+}
+</script>
+{% endblock %}

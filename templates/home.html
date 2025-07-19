@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary to-primary-dark text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">Temukan Event Terbaik</h1>
+        <p class="text-xl md:text-2xl mb-8 opacity-90">Pesan tiket untuk konser, seminar, dan event menarik lainnya</p>
+        <a href="{{ url_for('cari_tiket') }}" class="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors inline-block">
+            Pesan Tiket Sekarang
+        </a>
+    </div>
+</section>
+
+<!-- Trending Tickets -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center mb-12">Event Trending</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for ticket in tickets %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="h-48 bg-gray-200 flex items-center justify-center overflow-hidden rounded-t-xl">
+                    {% if ticket.image_url and ticket.image_url != "https://res.cloudinary.com/demo/image/upload/sample.jpg" %}
+                        <img src="{{ ticket.image_url }}" alt="{{ ticket.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <i class="fas fa-image text-4xl text-gray-400"></i>
+                    {% endif %}
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center mb-2">
+                        <span class="bg-primary text-white px-2 py-1 rounded text-xs font-medium">{{ ticket.category }}</span>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">{{ ticket.title }}</h3>
+                    <p class="text-gray-600 mb-2">
+                        <i class="fas fa-calendar mr-2"></i>
+                        {{ ticket.date.strftime('%d %B %Y') }}
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        {{ ticket.location }}
+                    </p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-bold text-primary">Rp {{ "{:,}".format(ticket.price) }}</span>
+                        <a href="{{ url_for('detail_tiket', ticket_id=ticket._id) }}" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+                            Lihat Detail
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+        <div class="space-y-4">
+            <div class="border border-gray-200 rounded-lg">
+                <button class="w-full px-6 py-4 text-left font-semibold flex justify-between items-center hover:bg-gray-50" onclick="toggleFAQ(1)">
+                    Bagaimana cara memesan tiket?
+                    <i class="fas fa-chevron-down" id="faq-icon-1"></i>
+                </button>
+                <div class="px-6 py-4 border-t border-gray-200 hidden" id="faq-content-1">
+                    <p class="text-gray-600">Anda dapat memesan tiket dengan mencari event yang diinginkan, memilih jumlah tiket, dan melakukan pembayaran melalui QR Code yang disediakan.</p>
+                </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg">
+                <button class="w-full px-6 py-4 text-left font-semibold flex justify-between items-center hover:bg-gray-50" onclick="toggleFAQ(2)">
+                    Metode pembayaran apa saja yang tersedia?
+                    <i class="fas fa-chevron-down" id="faq-icon-2"></i>
+                </button>
+                <div class="px-6 py-4 border-t border-gray-200 hidden" id="faq-content-2">
+                    <p class="text-gray-600">Saat ini kami menyediakan pembayaran melalui QR Code yang dapat dibayar menggunakan berbagai e-wallet dan mobile banking.</p>
+                </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg">
+                <button class="w-full px-6 py-4 text-left font-semibold flex justify-between items-center hover:bg-gray-50" onclick="toggleFAQ(3)">
+                    Bagaimana jika saya ingin membatalkan pesanan?
+                    <i class="fas fa-chevron-down" id="faq-icon-3"></i>
+                </button>
+                <div class="px-6 py-4 border-t border-gray-200 hidden" id="faq-content-3">
+                    <p class="text-gray-600">Pembatalan dapat dilakukan maksimal 24 jam sebelum event dimulai. Silakan hubungi customer service kami untuk proses pembatalan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function toggleFAQ(id) {
+    const content = document.getElementById(`faq-content-${id}`);
+    const icon = document.getElementById(`faq-icon-${id}`);
+    
+    content.classList.toggle('hidden');
+    icon.classList.toggle('fa-chevron-down');
+    icon.classList.toggle('fa-chevron-up');
+}
+</script>
+{% endblock %}

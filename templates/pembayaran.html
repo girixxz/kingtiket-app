@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold">Pembayaran</h1>
+        <p class="text-gray-600 mt-2">Selesaikan pembayaran untuk mendapatkan tiket Anda</p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Order Summary -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6">Ringkasan Pesanan</h2>
+            
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                    {% if ticket.image_url and ticket.image_url != "https://res.cloudinary.com/demo/image/upload/sample.jpg" %}
+                        <img src="{{ ticket.image_url }}" alt="{{ ticket.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <i class="fas fa-image text-gray-400"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                        <span class="bg-primary text-white px-2 py-1 rounded text-xs font-medium">{{ ticket.category }}</span>
+                    </div>
+                    <h3 class="font-bold">{{ ticket.title }}</h3>
+                    <p class="text-sm text-gray-600">{{ order.created_at.strftime('%d/%m/%Y • %H:%M') }}</p>
+                    <p class="text-sm text-gray-600">{{ ticket.location }}</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 pt-4 space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Harga per tiket</span>
+                    <span>Rp {{ "{:,}".format(ticket.price) }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Jumlah tiket</span>
+                    <span>{{ order.quantity }}x</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold border-t border-gray-200 pt-3">
+                    <span>Total Pembayaran</span>
+                    <span class="text-primary">Rp {{ "{:,}".format(order.total_amount) }}</span>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
+                <div class="flex items-center">
+                    <i class="fas fa-clock text-yellow-600 mr-2"></i>
+                    <span class="font-semibold text-yellow-800">Batas Waktu Pembayaran</span>
+                </div>
+                <p class="text-yellow-700 mt-1">{{ order.payment_deadline.strftime('%d/%m/%Y, %H.%M.%S') }}</p>
+            </div>
+        </div>
+        
+        <!-- Payment Method -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6">Metode Pembayaran</h2>
+            
+            <div class="text-center mb-6">
+                <div class="bg-gray-100 rounded-lg p-8 mb-4">
+                    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="mx-auto mb-4">
+                    <p class="text-sm text-gray-600">Scan untuk membayar</p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Invoice ID</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-mono">{{ invoice_id }}</span>
+                            <button onclick="copyInvoiceId()" class="text-primary hover:text-primary-dark">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="font-semibold mb-3">Cara Pembayaran:</h3>
+                <ol class="list-decimal list-inside space-y-2 text-sm text-gray-600">
+                    <li>Scan QR Code di atas menggunakan aplikasi e-wallet</li>
+                    <li>Masukkan nominal sesuai total pembayaran</li>
+                    <li>Konfirmasi pembayaran</li>
+                    <li>Klik tombol "Konfirmasi Pembayaran" di bawah</li>
+                </ol>
+            </div>
+            
+            <form method="POST" action="{{ url_for('konfirmasi_pembayaran', order_id=order._id) }}">
+                <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary-dark transition-colors">
+                    Konfirmasi Pembayaran
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyInvoiceId() {
+    const invoiceId = "{{ invoice_id }}";
+    navigator.clipboard.writeText(invoiceId).then(function() {
+        alert('Invoice ID berhasil disalin!');
+    });
+}
+</script>
+{% endblock %}

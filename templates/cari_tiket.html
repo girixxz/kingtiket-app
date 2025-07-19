@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold mb-8">Cari Tiket</h1>
+    
+    <!-- Search and Filters -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <input type="text" name="search" placeholder="Cari nama event atau lokasi..." 
+                       value="{{ search }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+            <div>
+                <select name="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="">Pilih Kategori</option>
+                    {% for category in categories %}
+                    <option value="{{ category.name }}" {% if selected_category == category.name %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <input type="date" name="date" value="{{ selected_date }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+            <div>
+                <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors flex items-center justify-center">
+                    <i class="fas fa-search mr-2"></i>
+                    Cari Tiket
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Results -->
+    <div class="mb-4">
+        <p class="text-gray-600">Menampilkan {{ tickets|length }} hasil</p>
+    </div>
+    
+    <!-- Tickets Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for ticket in tickets %}
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div class="relative">
+                <div class="h-48 bg-gray-200 flex items-center justify-center overflow-hidden rounded-t-xl">
+                    {% if ticket.image_url and ticket.image_url != "https://res.cloudinary.com/demo/image/upload/sample.jpg" %}
+                        <img src="{{ ticket.image_url }}" alt="{{ ticket.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <i class="fas fa-image text-4xl text-gray-400"></i>
+                    {% endif %}
+                </div>
+                <div class="absolute top-4 left-4">
+                    <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">{{ ticket.category }}</span>
+                </div>
+            </div>
+            <div class="p-6">
+                <h3 class="font-bold text-lg mb-2">{{ ticket.title }}</h3>
+                <div class="space-y-2 mb-4">
+                    <p class="text-gray-600 flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2 text-primary"></i>
+                        {{ ticket.location }}
+                    </p>
+                    <p class="text-gray-600 flex items-center">
+                        <i class="fas fa-calendar mr-2 text-primary"></i>
+                        {{ ticket.date.strftime('%d/%m/%Y') }}
+                    </p>
+                    <p class="text-gray-600 flex items-center">
+                        <i class="fas fa-users mr-2 text-primary"></i>
+                        {{ ticket.stock }} tiket tersisa
+                    </p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="text-2xl font-bold text-primary">Rp {{ "{:,}".format(ticket.price) }}</span>
+                        <p class="text-sm text-gray-500">per tiket</p>
+                    </div>
+                    <a href="{{ url_for('detail_tiket', ticket_id=ticket._id) }}" 
+                       class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+                        Lihat Detail
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if not tickets %}
+    <div class="text-center py-16">
+        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">Tidak ada tiket ditemukan</h3>
+        <p class="text-gray-500">Coba ubah kata kunci pencarian atau filter Anda</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
