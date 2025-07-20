@@ -17,7 +17,7 @@ load_dotenv()
 
 # Flask setup
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY')
+app.secret_key = os.getenv('SECRET_KEY')
 
 # MongoDB setup
 MONGO_URI = os.getenv('MONGO_URI')
