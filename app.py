@@ -40,9 +40,35 @@ orders = db.orders
 
 @app.route('/')
 def home():
-    # Get trending tickets (limit 6)
-    trending_tickets = list(tickets.find({"status": "active"}).limit(6))
-    return render_template('home.html', tickets=trending_tickets)
+    # Get latest tickets (limit 6)
+    latest_tickets = list(tickets.find({"status": "active"}).sort("created_at", -1).limit(6))
+    
+    # Get most purchased tickets
+    pipeline = [
+        {"$match": {"status": "lunas"}},
+        {"$group": {"_id": "$ticket_id", "total_sold": {"$sum": "$quantity"}}},
+        {"$sort": {"total_sold": -1}},
+        {"$limit": 8}
+    ]
+    
+    most_purchased = list(orders.aggregate(pipeline))
+    trending_tickets = []
+    
+    for item in most_purchased:
+        ticket = tickets.find_one({"_id": item["_id"], "status": "active"})
+        if ticket:
+            ticket['total_sold'] = item['total_sold']
+            trending_tickets.append(ticket)
+    
+    # If no trending tickets, fallback to latest
+    if not trending_tickets:
+        trending_tickets = list(tickets.find({"status": "active"}).limit(8))
+        for ticket in trending_tickets:
+            ticket['total_sold'] = 0
+    
+    return render_template('home.html', 
+                         latest_tickets=latest_tickets, 
+                         trending_tickets=trending_tickets)
 
 @app.route('/cari-tiket')
 def cari_tiket():
@@ -409,5 +435,4 @@ def admin_delete_tiket(ticket_id):
     return redirect(url_for('admin_tiket'))
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=True)
